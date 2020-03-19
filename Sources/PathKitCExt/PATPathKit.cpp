@@ -6,8 +6,7 @@
 
 using namespace std;
 
-static inline vector<const string> PATPathComponentsVector(const char *path) {
-    vector<const string> strings;
+static inline void PATFillPathComponentsVector(vector<string> &strings, const char *path) {
     size_t curPos = 0;
     size_t endPos = strlen(path);
     if (path[curPos] == '/') {
@@ -39,7 +38,8 @@ const char **PATPathComponents(const char *path, size_t *count, void **temp) {
         *count = 0;
         return new const char *[1];
     }
-    const vector<const string> *strings = new vector<const string>(PATPathComponentsVector(path));
+    vector<string> *strings = new vector<string>();
+    PATFillPathComponentsVector(*strings, path);
     const char **components = new const char *[strings->size()];
     for (int i = 0; i < strings->size(); i++) {
         components[i] = (*strings)[i].c_str();
@@ -48,7 +48,7 @@ const char **PATPathComponents(const char *path, size_t *count, void **temp) {
     return components;
 }
 
-static inline const char *PATPathFromComponents(const vector<const string> &comps) {
+static inline const char *PATPathFromComponents(const vector<string> &comps) {
     if (comps.empty()) {
         return strdup(".");
     }
@@ -73,8 +73,10 @@ static inline const char *PATPathFromComponents(const vector<const string> &comp
 }
 
 const char *PATAppend(const char *lhs, const char *rhs) {
-    vector<const string> lSlice = PATPathComponentsVector(lhs);
-    vector<const string> rSlice = PATPathComponentsVector(rhs);
+    vector<string> lSlice;
+    vector<string> rSlice;
+    PATFillPathComponentsVector(lSlice, lhs);
+    PATFillPathComponentsVector(rSlice, rhs);
 
     // Get rid of trailing "/" at the left side
     if (lSlice.size() > 1 && lSlice.back() == "/") {
@@ -83,16 +85,10 @@ const char *PATAppend(const char *lhs, const char *rhs) {
 
     // Advance after the first relevant "."
     if (count(lSlice.begin(), lSlice.end(), ".") > 0) {
-        vector<const string> filteredLSlice;
-        filteredLSlice.reserve(rSlice.size());
-        std::copy_if(lSlice.cbegin(), lSlice.cend(), back_inserter(filteredLSlice), [&](string s) { return s != "."; });
-        lSlice = filteredLSlice;
+        remove_if(lSlice.begin(), lSlice.end(), [&](const string s) { return s == "."; });
     }
     if (count(rSlice.begin(), rSlice.end(), ".") > 0) {
-        vector<const string> filteredRSlice;
-        filteredRSlice.reserve(rSlice.size());
-        std::copy_if(rSlice.cbegin(), rSlice.cend(), back_inserter(filteredRSlice), [&](string s) { return s != "."; });
-        rSlice = filteredRSlice;
+        remove_if(rSlice.begin(), rSlice.end(), [&](const string s) { return s == "."; });
     }
 
     // Eats up trailing components of the left and leading ".." of the right side
