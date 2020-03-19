@@ -128,7 +128,3 @@ void PATFreePathComponents(const char **components, void *temp) {
     vector<string> *array = (vector<string> *)temp;
     delete array;
 }
-
-__attribute__((constructor)) void asdf() {
-    PATAppend("a", ".");
-}
