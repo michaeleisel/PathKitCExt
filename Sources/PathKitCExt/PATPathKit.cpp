@@ -5,6 +5,31 @@
 
 using namespace std;
 
+const char **PATContentsAt(const char *path, size_t *count, void **temp) {
+    vector<string> *paths = new vector<string>;
+    *temp = paths;
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(path);
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            if (dir->d_name[0] == '.' && (dir->d_name[1] == '\0' || (dir->d_name[1] == '.' && dir->d_name[2] == '\0'))) {
+                continue;
+            }
+            paths->push_back(dir->d_name);
+        }
+        closedir(d);
+    }
+    const char **components = new const char *[paths->size()];
+    for (int i = 0; i < paths->size(); i++) {
+        components[i] = (*paths)[i].c_str();
+    }
+    *count = paths->size();
+    return components;
+}
+
 void PATFreePathComponents(const char **components, void *temp) {
     delete components;
     vector<string> *array = (vector<string> *)temp;
