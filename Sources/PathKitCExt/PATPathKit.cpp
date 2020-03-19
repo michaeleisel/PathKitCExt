@@ -83,12 +83,8 @@ const char *PATAppend(const char *lhs, const char *rhs) {
     }
 
     // Advance after the first relevant "."
-    if (count(lSlice.begin(), lSlice.end(), ".") > 0) {
-        remove_if(lSlice.begin(), lSlice.end(), [&](const string s) { return s == "."; });
-    }
-    if (count(rSlice.begin(), rSlice.end(), ".") > 0) {
-        remove_if(rSlice.begin(), rSlice.end(), [&](const string s) { return s == "."; });
-    }
+    lSlice.erase(remove(lSlice.begin(), lSlice.end(), "."), lSlice.end());
+    rSlice.erase(remove(rSlice.begin(), rSlice.end(), "."), rSlice.end());
 
     // Eats up trailing components of the left and leading ".." of the right side
     while (!lSlice.empty() && lSlice.back() != ".." && !rSlice.empty() && rSlice.front() == "..") {
@@ -131,4 +127,8 @@ void PATFreePathComponents(const char **components, void *temp) {
     delete components;
     vector<string> *array = (vector<string> *)temp;
     delete array;
+}
+
+__attribute__((constructor)) void asdf() {
+    PATAppend("a", ".");
 }
