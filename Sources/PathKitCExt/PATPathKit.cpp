@@ -85,7 +85,7 @@ const char *PATAppend(const char *lhs, const char *rhs) {
     rSlice = filteredRSlice;
 
     // Eats up trailing components of the left and leading ".." of the right side
-    while (lSlice.back() != ".." && !lSlice.empty() && rSlice.front() == "..") {
+    while (!lSlice.empty() && lSlice.back() != ".." && !rSlice.empty() && rSlice.front() == "..") {
         if (lSlice.size() > 1 || lSlice.front() != "/") {
             // A leading "/" is never popped
             lSlice.pop_back();
