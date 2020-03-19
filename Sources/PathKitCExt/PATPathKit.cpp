@@ -30,7 +30,6 @@ static inline void PATFillPathComponentsVector(vector<string> &strings, const ch
     if (endPos > 1 && path[endPos - 1] == '/') {
         strings.push_back("/");
     }
-    return strings;
 }
 
 const char **PATPathComponents(const char *path, size_t *count, void **temp) {
