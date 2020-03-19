@@ -18,5 +18,7 @@ let package = Package(
         .testTarget(
             name: "PathKitCExtTests",
             dependencies: ["PathKitCExt"]),
-    ]
+    ],
+    cxxLanguageStandard: .cxx1z
+
 )
