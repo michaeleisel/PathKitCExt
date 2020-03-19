@@ -2,7 +2,7 @@
 #include <stddef.h>
 
 #ifdef __cplusplus
-export "C" {
+extern "C" {
 #endif
 
 void PATFreePathComponents(const char **components, void *temp);
