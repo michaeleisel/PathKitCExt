@@ -1,5 +1,5 @@
 #include "PATPathKit.h"
-#include <cstring>
+#include <string>
 #include <vector>
 #include <string>
 
