@@ -6,8 +6,8 @@
 
 using namespace std;
 
-static inline vector<string> PATPathComponentsVector(const char *path) {
-    vector<string> strings = vector<string>();
+static inline vector<const string> PATPathComponentsVector(const char *path) {
+    vector<const string> strings;
     size_t curPos = 0;
     size_t endPos = strlen(path);
     if (path[curPos] == '/') {
@@ -39,7 +39,7 @@ const char **PATPathComponents(const char *path, size_t *count, void **temp) {
         *count = 0;
         return new const char *[1];
     }
-    const vector<string> *strings = new vector<string>(PATPathComponentsVector(path));
+    const vector<const string> *strings = new vector<const string>(PATPathComponentsVector(path));
     const char **components = new const char *[strings->size()];
     for (int i = 0; i < strings->size(); i++) {
         components[i] = (*strings)[i].c_str();
@@ -48,12 +48,17 @@ const char **PATPathComponents(const char *path, size_t *count, void **temp) {
     return components;
 }
 
-static inline const char *PATPathFromComponents(const vector<string> comps) {
+static inline const char *PATPathFromComponents(const vector<const string> &comps) {
     if (comps.empty()) {
         return strdup(".");
     }
     int i = 0;
+    int sum = 0;
     string path;
+    for (const auto &comp : comps) {
+        sum += comp.size() + 1;
+    }
+    path.reserve(sum);
     for (; i < comps.size(); i++) {
         path.append(comps[i]);
         if (i != comps.size() - 1) {
@@ -68,8 +73,8 @@ static inline const char *PATPathFromComponents(const vector<string> comps) {
 }
 
 const char *PATAppend(const char *lhs, const char *rhs) {
-    vector<string> lSlice = PATPathComponentsVector(lhs);
-    vector<string> rSlice = PATPathComponentsVector(rhs);
+    vector<const string> lSlice = PATPathComponentsVector(lhs);
+    vector<const string> rSlice = PATPathComponentsVector(rhs);
 
     // Get rid of trailing "/" at the left side
     if (lSlice.size() > 1 && lSlice.back() == "/") {
@@ -77,12 +82,18 @@ const char *PATAppend(const char *lhs, const char *rhs) {
     }
 
     // Advance after the first relevant "."
-    vector<string> filteredLSlice;
-    vector<string> filteredRSlice;
-    std::copy_if(lSlice.cbegin(), lSlice.cend(), back_inserter(filteredLSlice), [&](string s) { return s != "."; });
-    std::copy_if(rSlice.cbegin(), rSlice.cend(), back_inserter(filteredRSlice), [&](string s) { return s != "."; });
-    lSlice = filteredLSlice;
-    rSlice = filteredRSlice;
+    if (count(lSlice.begin(), lSlice.end(), ".") > 0) {
+        vector<const string> filteredLSlice;
+        filteredLSlice.reserve(rSlice.size());
+        std::copy_if(lSlice.cbegin(), lSlice.cend(), back_inserter(filteredLSlice), [&](string s) { return s != "."; });
+        lSlice = filteredLSlice;
+    }
+    if (count(rSlice.begin(), rSlice.end(), ".") > 0) {
+        vector<const string> filteredRSlice;
+        filteredRSlice.reserve(rSlice.size());
+        std::copy_if(rSlice.cbegin(), rSlice.cend(), back_inserter(filteredRSlice), [&](string s) { return s != "."; });
+        rSlice = filteredRSlice;
+    }
 
     // Eats up trailing components of the left and leading ".." of the right side
     while (!lSlice.empty() && lSlice.back() != ".." && !rSlice.empty() && rSlice.front() == "..") {
@@ -90,13 +101,7 @@ const char *PATAppend(const char *lhs, const char *rhs) {
             // A leading "/" is never popped
             lSlice.pop_back();
         }
-        if (!rSlice.empty()) {
-            rSlice.erase(rSlice.begin());
-        }
-
-        if (lSlice.empty() || rSlice.empty()) {
-            break;
-        }
+        rSlice.erase(rSlice.begin());
     }
     lSlice.insert(lSlice.end(), rSlice.begin(), rSlice.end());
     return PATPathFromComponents(lSlice);
