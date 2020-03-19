@@ -37,7 +37,7 @@ static inline vector<string> PATPathComponentsVector(const char *path) {
 const char **PATPathComponents(const char *path, size_t *count, void **temp) {
     if (!*path) {
         *count = 0;
-        return NULL;
+        return new const char *[1];
     }
     const vector<string> *strings = new vector<string>(PATPathComponentsVector(path));
     const char **components = new const char *[strings->size()];
