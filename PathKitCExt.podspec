@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'PathKitCExt'
-  s.version          = '1.0.0'
+  s.version          = '1.0.2'
   s.summary          = 'C extensions for PathKit, do not use directly'
 
   s.description      = <<-DESC
