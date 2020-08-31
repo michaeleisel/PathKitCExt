@@ -4,6 +4,7 @@ Pod::Spec.new do |s|
   s.summary          = 'C extensions for PathKit, do not use directly'
 
   s.description      = <<-DESC
+                        C extensions for PathKit, do not use directly
                        DESC
 
   s.homepage         = 'https://github.com/michaeleisel/PathKitCExt'
@@ -15,5 +16,5 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.9'
   s.tvos.deployment_target = '9.0'
 
-  s.source_files = 'Sources/**/*.{h,hh,mm,m,c,cpp,swift}'
+  s.source_files = 'Sources/**/*.{h,hh,mm,m,c,cpp}'
 end
